@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Schedule</title>
+    
+    <!-- Icons and Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #111827;
+            --card-bg-color: #1F2937;
+            --border-color: #374151;
+            --primary-color: #3B82F6;
+            --primary-hover: #2563EB;
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --success-color: #10B981;  /* Arrived */
+            --danger-color: #F87171;   /* Delayed */
+            --warning-color: #F59E0B;  /* On Time / Departed */
+            --info-color: #60A5FA;     /* Scheduled */
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 2rem;
+        }
+
+        .main-container { max-width: 1400px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 2.5rem; }
+        .header h1 { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); }
+        .header p { font-size: 1.125rem; color: var(--text-secondary); margin-top: 0.5rem; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 5fr 3fr;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        h2 i { color: var(--primary-color); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th {
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+        tr:last-child td { border-bottom: none; }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #374151;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+        
+        .datetime-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn-full { padding: 0.75rem 1.5rem; font-size: 1rem; }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        
+        .btn-danger { background-color: transparent; color: var(--danger-color); }
+        .btn-danger:hover { background-color: rgba(239, 68, 68, 0.1); }
+        
+        .btn-warning { background-color: transparent; color: var(--warning-color); }
+        .btn-warning:hover { background-color: rgba(245, 158, 11, 0.1); }
+
+        .actions-cell { display: flex; gap: 0.5rem; }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .badge-scheduled { background-color: rgba(96, 165, 250, 0.1); color: var(--info-color); }
+        .badge-on-time { background-color: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .badge-delayed { background-color: rgba(248, 113, 113, 0.1); color: var(--danger-color); }
+        .badge-departed { background-color: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .badge-arrived { background-color: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+            body { padding: 1rem; }
+        }
+        
+        @media (max-width: 768px) { .datetime-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header class="header">
+            <h1>Flight Operations</h1>
+            <p>Monitor and manage all scheduled flights.</p>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="content-grid">
+            <div class="card">
+                <h2><i class="fas fa-plane-departure"></i> Active Flights</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Flight No</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Departure</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for flight in flights %}
+                            <tr>
+                                <td>{{ flight.flight_no }}</td>
+                                <td>{{ flight.frm }}</td>
+                                <td>{{ flight.too }}</td>
+                                <td>{{ flight.dep_date }} {{ flight.dep_time }}</td>
+                                <td>
+                                    <span class="badge badge-{{ flight.status.value.lower().replace(' ', '-') }}">{{ flight.status.value }}</span>
+                                </td>
+                                <td class="actions-cell" style="justify-content: flex-end;">
+                                    <a href="{{ url_for('edit_flight', flight_no=flight.flight_no) }}" class="btn btn-warning">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <form action="{{ url_for('delete_flight') }}" method="POST" style="margin:0;">
+                                        <input type="hidden" name="flight_no" value="{{ flight.flight_no }}">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Add New Flight</h2>
+                <form action="{{ url_for('add_flight') }}" method="POST">
+                    <div class="form-group">
+                        <label for="flight_no">Flight Number</label>
+                        <input type="text" name="flight_no" id="flight_no" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="from">From</label>
+                        <select name="from" id="from" required>
+                            <optgroup label="Indian Metro Hubs">
+                                <option value="DEL">Delhi (DEL)</option>
+                                <option value="BOM">Mumbai (BOM)</option>
+                                <option value="BLR">Bangalore (BLR)</option>
+                                <option value="MAA">Chennai (MAA)</option>
+                                <option value="CCU">Kolkata (CCU)</option>
+                                <option value="HYD">Hyderabad (HYD)</option>
+                            </optgroup>
+                            <optgroup label="Tier-2 Indian Cities">
+                                <option value="AMD">Ahmedabad (AMD)</option>
+                                <option value="PNQ">Pune (PNQ)</option>
+                                <option value="GOI">Goa (GOI)</option>
+                                <option value="COK">Kochi (COK)</option>
+                                <option value="JAI">Jaipur (JAI)</option>
+                                <option value="LKO">Lucknow (LKO)</option>
+                            </optgroup>
+                            <optgroup label="Middle East Hubs">
+                                <option value="DXB">Dubai (DXB)</option>
+                                <option value="DOH">Doha (DOH)</option>
+                                <option value="AUH">Abu Dhabi (AUH)</option>
+                            </optgroup>
+                            <optgroup label="Southeast Asia Hubs">
+                                <option value="SIN">Singapore (SIN)</option>
+                                <option value="BKK">Bangkok (BKK)</option>
+                                <option value="KUL">Kuala Lumpur (KUL)</option>
+                            </optgroup>
+                            <optgroup label="European Hubs">
+                                <option value="LHR">London (LHR)</option>
+                                <option value="CDG">Paris (CDG)</option>
+                                <option value="FRA">Frankfurt (FRA)</option>
+                                <option value="AMS">Amsterdam (AMS)</option>
+                            </optgroup>
+                            <optgroup label="North American Hubs">
+                                <option value="JFK">New York (JFK)</option>
+                                <option value="SFO">San Francisco (SFO)</option>
+                                <option value="LAX">Los Angeles (LAX)</option>
+                                <option value="ORD">Chicago (ORD)</option>
+                                <option value="YYZ">Toronto (YYZ)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="to">To</label>
+                        <select name="to" id="to" required>
+                            <optgroup label="Indian Metro Hubs">
+                                <option value="DEL">Delhi (DEL)</option>
+                                <option value="BOM">Mumbai (BOM)</option>
+                                <option value="BLR">Bangalore (BLR)</option>
+                                <option value="MAA">Chennai (MAA)</option>
+                                <option value="CCU">Kolkata (CCU)</option>
+                                <option value="HYD">Hyderabad (HYD)</option>
+                            </optgroup>
+                            <optgroup label="Tier-2 Indian Cities">
+                                <option value="AMD">Ahmedabad (AMD)</option>
+                                <option value="PNQ">Pune (PNQ)</option>
+                                <option value="GOI">Goa (GOI)</option>
+                                <option value="COK">Kochi (COK)</option>
+                                <option value="JAI">Jaipur (JAI)</option>
+                                <option value="LKO">Lucknow (LKO)</option>
+                            </optgroup>
+                            <optgroup label="Middle East Hubs">
+                                <option value="DXB">Dubai (DXB)</option>
+                                <option value="DOH">Doha (DOH)</option>
+                                <option value="AUH">Abu Dhabi (AUH)</option>
+                            </optgroup>
+                            <optgroup label="Southeast Asia Hubs">
+                                <option value="SIN">Singapore (SIN)</option>
+                                <option value="BKK">Bangkok (BKK)</option>
+                                <option value="KUL">Kuala Lumpur (KUL)</option>
+                            </optgroup>
+                            <optgroup label="European Hubs">
+                                <option value="LHR">London (LHR)</option>
+                                <option value="CDG">Paris (CDG)</option>
+                                <option value="FRA">Frankfurt (FRA)</option>
+                                <option value="AMS">Amsterdam (AMS)</option>
+                            </optgroup>
+                            <optgroup label="North American Hubs">
+                                <option value="JFK">New York (JFK)</option>
+                                <option value="SFO">San Francisco (SFO)</option>
+                                <option value="LAX">Los Angeles (LAX)</option>
+                                <option value="ORD">Chicago (ORD)</option>
+                                <option value="YYZ">Toronto (YYZ)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select name="status" id="status" required>
+                            {% for status in flight_statuses %}
+                            <option value="{{ status }}">{{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="datetime-grid">
+                        <div class="form-group">
+                            <label for="dep_date">Departure Date</label>
+                            <input type="date" name="dep_date" id="dep_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dep_time">Departure Time</label>
+                            <input type="time" name="dep_time" id="dep_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="arr_date">Arrival Date</label>
+                            <input type="date" name="arr_date" id="arr_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="arr_time">Arrival Time</label>
+                            <input type="time" name="arr_time" id="arr_time" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" style="width: 100%; margin-top: 1rem;">
+                        <i class="fas fa-plus"></i> Add Flight
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

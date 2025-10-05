@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroTrack | Global Logistics Management</title>
+    
+    <!-- Icons and Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color-dark: #0d1117;
+            --bg-color-light: #161b22;
+            --primary-color: #3B82F6;
+            --primary-glow: rgba(59, 130, 246, 0.2);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes backgroundPan {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color-dark), var(--bg-color-light), var(--bg-color-dark));
+            background-size: 200% 200%;
+            animation: backgroundPan 15s ease infinite;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-container {
+            max-width: 800px;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title-card {
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .title-card h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+        }
+
+        .title-card h1 span {
+            background: linear-gradient(90deg, var(--text-primary), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-card p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2.5rem auto;
+        }
+
+        .navigation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+            opacity: 0; /* Start hidden for animation */
+        }
+
+        .nav-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .nav-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 25px var(--primary-glow);
+        }
+
+        .nav-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            transition: color 0.3s ease;
+        }
+
+        .nav-card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-card span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* New Header for Auth buttons */
+        .auth-header {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .auth-header .username {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .navigation-grid {
+                grid-template-columns: 1fr;
+            }
+            .title-card h1 {
+                font-size: 2.5rem;
+            }
+            .auth-header {
+                position: static;
+                justify-content: center;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="auth-header">
+        {% if 'user_id' in session %}
+            <span class="username">Welcome, {{ session['username'] }}</span>
+            <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+            <a href="{{ url_for('register') }}" class="btn">Register</a>
+        {% endif %}
+    </header>
+
+    <div class="main-container">
+        <div class="title-card">
+            <h1>Welcome to <span>AeroTrack</span></h1>
+            <p>Your all-in-one portal for managing flights, passengers, and shipments with precision and ease.</p>
+        </div>
+
+        <div class="navigation-grid">
+            <a href="{{ url_for('flights') }}" class="nav-card">
+                <div class="icon"><i class="fas fa-plane-departure"></i></div>
+                <h2>Flights</h2>
+                <span>Schedule & Monitor</span>
+            </a>
+            <a href="{{ url_for('passengers') }}" class="nav-card">
+                <div class="icon"><i class="fas fa-users"></i></div>
+                <h2>Passengers</h2>
+                <span>View & Manage</span>
+            </a>
+            <a href="{{ url_for('shipments') }}" class="nav-card">
+                <div class="icon"><i class="fas fa-truck-fast"></i></div>
+                <h2>Shipments</h2>
+                <span>Track & Dispatch</span>
+            </a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 AeroTrack Management System</p>
+    </footer>
+
+</body>
+</html>
+
