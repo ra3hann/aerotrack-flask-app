@@ -2,7 +2,7 @@
 
 AeroTrack is a full-featured web application built with Flask for managing flights, passengers, and shipments. This project was developed as part of the AI Campus Assignment.
 
-The live, deployed application can be accessed here: **[Your Render App Link Here]**
+The live, deployed application can be accessed here: https://aerotrack-flask-app-12.onrender.com/
 
 ## Key Features
 
@@ -26,7 +26,7 @@ The live, deployed application can be accessed here: **[Your Render App Link Her
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/ra3hann/aerotrack-flask-app.git
     ```
 2.  **Install dependencies:**
     ```bash
